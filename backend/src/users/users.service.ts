@@ -38,8 +38,8 @@ export class UsersService {
         ...dto,
       },
     });
-    delete user.password;
-    return user;
+    const { password, ...result } = user;
+    return result;
   }
 
   async getFollowers(userId: string) {

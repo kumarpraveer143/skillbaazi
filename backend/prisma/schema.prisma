@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql" // or mysql
-  url      = env("DATABASE_URL")
 }
 
 //////////////////////
@@ -49,25 +48,25 @@ enum NotificationType {
 //////////////////////
 
 model User {
-  id          String   @id @default(uuid())
-  name        String
-  email       String   @unique
-  password    String
-  role        UserRole @default(USER)
+  id       String   @id @default(uuid())
+  name     String
+  email    String   @unique
+  password String
+  role     UserRole @default(USER)
 
-  bio         String?
-  company     String?
-  skills      String[]
-  isPrivate   Boolean  @default(false)
-  isActive    Boolean  @default(true)
+  bio       String?
+  company   String?
+  skills    String[]
+  isPrivate Boolean  @default(false)
+  isActive  Boolean  @default(true)
 
-  posts       Post[]
-  comments    Comment[]
-  reactions   Reaction[]
+  posts     Post[]
+  comments  Comment[]
+  reactions Reaction[]
 
   // Follow system
-  followers   Follow[] @relation("followers")
-  following   Follow[] @relation("following")
+  followers Follow[] @relation("followers")
+  following Follow[] @relation("following")
 
   sentRequests     FollowRequest[] @relation("sentRequests")
   receivedRequests FollowRequest[] @relation("receivedRequests")
@@ -76,10 +75,10 @@ model User {
   blockedUsers   Block[] @relation("blockedUsers")
   blockedByUsers Block[] @relation("blockedByUsers")
 
-  notifications   Notification[]
+  notifications Notification[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 //////////////////////
@@ -87,12 +86,12 @@ model User {
 //////////////////////
 
 model Post {
-  id        String   @id @default(uuid())
-  content   String
-  type      PostType
+  id      String   @id @default(uuid())
+  content String
+  type    PostType
 
-  authorId  String
-  author    User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   comments  Comment[]
   reactions Reaction[]
@@ -108,14 +107,14 @@ model Post {
 //////////////////////
 
 model Comment {
-  id        String   @id @default(uuid())
-  content   String
+  id      String @id @default(uuid())
+  content String
 
-  postId    String
-  userId    String
+  postId String
+  userId String
 
-  post      Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -128,14 +127,14 @@ model Comment {
 //////////////////////
 
 model Reaction {
-  id        String        @id @default(uuid())
-  type      ReactionType
+  id   String       @id @default(uuid())
+  type ReactionType
 
-  userId    String
-  postId    String
+  userId String
+  postId String
 
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post      Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
@@ -147,16 +146,16 @@ model Reaction {
 //////////////////////
 
 model FollowRequest {
-  id          String       @id @default(uuid())
-  senderId    String
-  receiverId  String
-  status      FollowStatus @default(PENDING)
+  id         String       @id @default(uuid())
+  senderId   String
+  receiverId String
+  status     FollowStatus @default(PENDING)
 
-  sender      User @relation("sentRequests", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver    User @relation("receivedRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender   User @relation("sentRequests", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("receivedRequests", fields: [receiverId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([senderId, receiverId])
   @@index([receiverId, status])
@@ -167,14 +166,14 @@ model FollowRequest {
 //////////////////////
 
 model Follow {
-  id           String   @id @default(uuid())
-  followerId   String
-  followingId  String
+  id          String @id @default(uuid())
+  followerId  String
+  followingId String
 
-  follower     User @relation("followers", fields: [followerId], references: [id], onDelete: Cascade)
-  following    User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+  follower  User @relation("followers", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
 
-  createdAt    DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([followerId, followingId])
   @@index([followingId])
@@ -185,14 +184,14 @@ model Follow {
 //////////////////////
 
 model Block {
-  id          String   @id @default(uuid())
-  blockerId   String
-  blockedId   String
+  id        String @id @default(uuid())
+  blockerId String
+  blockedId String
 
-  blocker     User @relation("blockedUsers", fields: [blockerId], references: [id], onDelete: Cascade)
-  blocked     User @relation("blockedByUsers", fields: [blockedId], references: [id], onDelete: Cascade)
+  blocker User @relation("blockedUsers", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("blockedByUsers", fields: [blockedId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([blockerId, blockedId])
 }
@@ -202,13 +201,13 @@ model Block {
 //////////////////////
 
 model Notification {
-  id        String           @id @default(uuid())
-  type      NotificationType
-  message   String
-  isRead    Boolean          @default(false)
+  id      String           @id @default(uuid())
+  type    NotificationType
+  message String
+  isRead  Boolean          @default(false)
 
-  userId    String
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 

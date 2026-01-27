@@ -20,7 +20,9 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
   }
 
   async validate(req: Request, payload: { sub: string; email: string }) {
-    const refreshToken = req.get('authorization').replace('Bearer', '').trim();
+    const authHeader = req.get('authorization');
+    if (!authHeader) throw new UnauthorizedException();
+    const refreshToken = authHeader.replace('Bearer', '').trim();
     // Ideally we should validate if this refresh token matches what's in DB if we store it
     // But for this requirement we just check user existence and return logic
     const user = await this.prisma.user.findUnique({
