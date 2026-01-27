@@ -1,9 +1,11 @@
 import { Body, Controller, Delete, Param, Post, UseGuards } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { BlocksService } from './blocks.service';
 import { BlockUserDto } from './dto/block-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../common/decorators/get-user.decorator';
 
+@ApiTags('Blocks')
 @UseGuards(JwtAuthGuard)
 @Controller('blocks')
 export class BlocksController {

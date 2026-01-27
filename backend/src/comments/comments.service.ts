@@ -1,28 +1,36 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Injectable()
 export class CommentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   async create(userId: string, dto: CreateCommentDto) {
-    // Check if blocked
     const post = await this.prisma.post.findUnique({ where: { id: dto.postId }});
     if (!post) throw new NotFoundException('Post not found');
 
-    // Check blocking (omitted for brevity but crucial in prod)
-    // Assume guard or middleware handles general access, but specific logic like "blocked users cannot comment" needs check
-    // If author of post blocked this user
-    // We can do a check here.
-
-    return this.prisma.comment.create({
+    const comment = await this.prisma.comment.create({
       data: {
         content: dto.content,
         postId: dto.postId,
         userId: userId,
       },
     });
+
+    if (post.authorId !== userId) {
+      await this.notificationsService.create(
+        post.authorId,
+        'COMMENT',
+        `Someone commented on your post`
+      );
+    }
+    
+    return comment;
   }
 
   async remove(id: string, userId: string) {

@@ -1,9 +1,11 @@
 import { Body, Controller, Get, Param, Post, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { FollowsService } from './follows.service';
 import { SendFollowRequestDto } from './dto/send-follow-request.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../common/decorators/get-user.decorator';
 
+@ApiTags('Follows')
 @UseGuards(JwtAuthGuard)
 @Controller('follows')
 export class FollowsController {
