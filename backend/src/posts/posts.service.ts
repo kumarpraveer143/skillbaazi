@@ -32,6 +32,7 @@ export class PostsService {
                           email: true
                       }
                   },
+                  reactionSummary: true,
                   _count: {
                       select: {
                           comments: true,
@@ -71,7 +72,8 @@ export class PostsService {
                },
                orderBy: { createdAt: 'asc' } 
           },
-          reactions: true
+          reactions: true,
+          reactionSummary: true
       }
     });
     if (!post) throw new NotFoundException('Post not found');
